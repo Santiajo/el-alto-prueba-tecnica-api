@@ -1,0 +1,15 @@
+# Entorno virtual (Vital quitarlo, son archivos locales de tu PC)
+venv/
+env/
+ENV/
+
+# Archivos de caché de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de configuración de VS Code
+.vscode/
+
+# Variables de entorno (donde suelen ir contraseñas o llaves API)
+.env
