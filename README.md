@@ -13,31 +13,32 @@ Tener instalado en equipo local:
 ## Instalación y Ejecución
 
 **1. Clonar repositorio**
-\`\`\`bash
-git clone <URL_DE_TU_REPOSITORIO>
+```bash
+git clone <https://github.com/Santiajo/el-alto-prueba-tecnica-api.git>
 cd api_bencina
-\`\`\`
+```
 
 **2. Crear y activar un entorno virtual (Recomendado)**
-\`\`\`bash
-# Windows
+```bash
+### Windows
 python -m venv venv
 venv\Scripts\activate
 
-# macOS/Linux
+### macOS/Linux
 python3 -m venv venv
 source venv/bin/activate
-\`\`\`
+```
 
 **3. Instalar dependencias**
-\`\`\`bash
+```bash
 pip install -r requirements.txt
-\`\`\`
+```
 
 **4. Ejecutar servidor local**
-\`\`\`bash
+```bash
 uvicorn main:app --reload
-\`\`\`
+```
+
 El servidor se iniciará en `http://127.0.0.1:8000`.
 
 ## Estructura del Proyecto
@@ -56,7 +57,9 @@ Al estar construido con FastAPI, la documentación interactiva (Swagger UI) se g
 * **ReDoc:** `http://127.0.0.1:8000/redoc`
 
 ### Endpoint Principal
-\`GET /api/stations/search\`
+```http
+GET /api/stations/search
+```
 
 **Parámetros (Query):**
 * `lat` (float, requerido): Latitud de origen.
@@ -69,17 +72,17 @@ Al estar construido con FastAPI, la documentación interactiva (Swagger UI) se g
 ### Ejemplos de uso
 
 **1. Estación más cercana por producto (Gasolina 93)**
-\`\`\`text
+```text
 GET /api/stations/search?lat=-33.685&lng=-71.215&product=93&nearest=true
-\`\`\`
+```
 
 **2. Estación más cercana con tienda y menor precio (Diesel)**
-\`\`\`text
+```text
 GET /api/stations/search?lat=-33.685&lng=-71.215&product=diesel&store=true&cheapest=true
-\`\`\`
+```
 
 **Ejemplo de Respuesta Exitosa (Status 200 OK):**
-\`\`\`json
+```json
 {
     "success": true,
     "data": {
@@ -100,7 +103,7 @@ GET /api/stations/search?lat=-33.685&lng=-71.215&product=diesel&store=true&cheap
         "tiene_tienda": true
     }
 }
-\`\`\`
+```
 
 ## Manejo de Errores y Excepciones
 
@@ -110,3 +113,15 @@ La API está construida para no fallar de forma silenciosa ni exponer detalles d
 * **Error 400 Bad Request (`ValueError`):** Lanzado cuando se procesan los datos exitosamente, pero no se encuentran estaciones que cumplan con los filtros solicitados por el usuario.
 * **Error 503 Service Unavailable (`ConnectionError` / `httpx`):** Implementado en `services.py` como salvaguarda para dependencia externa. Si la librería `httpx` detecta que la API de Bencina en Línea experimenta una caída (Timeouts, bloqueos de conexión o respuestas HTTP 5xx), el error interno `httpx.RequestError` es capturado y transformado en un HTTP 503, informando al cliente que el proveedor de datos está fuera de servicio, sin detener el servicio.
 * **Error 500 Internal Server Error:** Un Exception Handler global (En `main.py`), actúa como última red de seguridad. Atrapa fallos no manejados del código interno (Ej: cambios en la estructura del JSON en la API de bencina en línea), devolviendo un JSON estandarizado y manteniendo la aplicación viva.
+
+## Notas de Ingeniería y en Datos
+
+Durante el desarrollo y fase de pruebas comparativas, se identificó que la fuente de datos oficial (API Bencina en Línea) presenta vacíos significativos en la categorización de servicios a nivel nacional. Muchas de las estaciones que operan en la realidad no tienen registrados servicios anexos, provocando que las búsquedas estrictas de "Tienda de Conveniencia", "Baños", "Cajeros" y "Farmacias" arrojen cero resultados en amplias zonas geográficas, tanto en esta API como en el portal web oficial.
+
+Como intento de mitigar esta deficiencia en los datos, se implementó una validación flexible usando **Coincidencia Difusa** y **Variables Cercanas** en el procesamiento de los datos (`services.py`). 
+
+Este motor de búsqueda no depende exclusivamente del ID oficial de la tienda de conveniencia (ID 4), sino que:
+1. Escanea los nombres de servicios buscando palabras claves (`"tienda"`, `"conveniencia"`, `"pronto"`, `"upa"`, `"spacio"`, `"ok market"`).
+2. Infiere la existencia de posibles tiendas anexas evaluando las IDs de servicios correlacionados a tiendas (como cajeros automáticos y baños públicos).
+
+Esta estrategia garantiza que la API busque exhaustivamente tiendas, entregando resultados precisos siempre que el registro de los datos originales lo permita.

@@ -21,9 +21,36 @@ store: Con tienda (opcional: true/false)
 cheapest: Con menor precio (opcional: true/false)
 """
 class SearchParams(BaseModel):
-    lat: float = Field(-33.685, description="Latitud de origen (ej. -33.685)")
-    lng: float = Field(-71.215, description="Longitud de origen (ej. -71.215)")
-    product: ProductType = Field(..., description="Tipo de combustible requerido")
-    nearest: Optional[bool] = Field(False, description="Buscar la más cercana")
-    store: Optional[bool] = Field(False, description="Debe tener tienda")
-    cheapest: Optional[bool] = Field(False, description="Debe tener el menor precio")
+    # Campos obligatorios con Pydantic Field (...)
+    lat: float = Field(
+        ..., 
+        description="Latitud geográfica de origen para el cálculo de cercanía.",
+        json_schema_extra={"example": -33.685}
+    )
+    
+    lng: float = Field(
+        ..., 
+        description="Longitud geográfica de origen para el cálculo de cercanía.",
+        json_schema_extra={"example": -71.215}
+    )
+    
+    product: ProductType = Field(
+        ..., 
+        description="Tipo de combustible a consultar en las estaciones."
+    )
+    
+    # Campos opcionales con valores por defecto
+    nearest: bool = Field(
+        False, 
+        description="Si es verdadero, el sistema devolverá la estación con menor distancia lineal."
+    )
+    
+    store: bool = Field(
+        False, 
+        description="Si es verdadero, se aplicará el filtro de tienda de conveniencia y servicios proxy."
+    )
+    
+    cheapest: bool = Field(
+        False, 
+        description="Si es verdadero, se priorizará el precio más bajo del mercado."
+    )
