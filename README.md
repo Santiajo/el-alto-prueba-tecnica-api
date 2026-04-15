@@ -14,7 +14,7 @@ Tener instalado en equipo local:
 
 **1. Clonar repositorio**
 ```bash
-git clone <https://github.com/Santiajo/el-alto-prueba-tecnica-api.git>
+git clone https://github.com/Santiajo/el-alto-prueba-tecnica-api.git
 cd api_bencina
 ```
 
@@ -84,24 +84,20 @@ GET /api/stations/search?lat=-33.685&lng=-71.215&product=diesel&store=true&cheap
 **Ejemplo de Respuesta Exitosa (Status 200 OK):**
 ```json
 {
-    "success": true,
-    "data": {
-        "id": "10056",
-        "compania": "COPEC",
-        "direccion": "San Martin Esq. Uribe",
-        "comuna": "Antofagasta",
-        "region": "ANTOFAGASTA",
-        "latitud": -23.6491868026,
-        "longitud": -70.4011811037,
-        "distancia(lineal)": 0.5,
-        "precios93": 1347,
-        "tienda": {
-            "codigo": "2510",
-            "nombre": "Tienda Pronto Antofagasta",
-            "tipo": "Pronto / Punto"
-        },
-        "tiene_tienda": true
-    }
+  "success": true,
+  "data": {
+    "id": "71",
+    "compania": "COPEC",
+    "direccion": "SAN MARTIN ESQ. URIBE 0",
+    "comuna": "Antofagasta",
+    "region": "Antofagasta",
+    "latitud": -23.64914089749835,
+    "longitud": -70.40098875761032,
+    "distancia(lineal)": 0.02,
+    "precios93": 1653,
+    "tienda": null,
+    "tiene_tienda": false
+  }
 }
 ```
 
@@ -125,3 +121,5 @@ Este motor de búsqueda no depende exclusivamente del ID oficial de la tienda de
 2. Infiere la existencia de posibles tiendas anexas evaluando las IDs de servicios correlacionados a tiendas (como cajeros automáticos y baños públicos).
 
 Esta estrategia garantiza que la API busque exhaustivamente tiendas, entregando resultados precisos siempre que el registro de los datos originales lo permita.
+
+Cabe destacar que se optó por poner un límite estricto en este filtro con mayor flexibilidad, ya que seguir relajando aún más los parámetros de la búsqueda incrementaría el riesgo de generar falsos positivos (indicar la presencia de una tienda donde físicamente no existe), comprometiendo la fiabilidad de la respuesta.
